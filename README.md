@@ -5,6 +5,9 @@ Changes
 1.3.0.0
 
 * Initial support for Oculus SDK 1.3.0.0
+0.8.0.0
+
+* Initial support for Oculus SDK 0.8.0.0
 
 0.7.0.0
 
