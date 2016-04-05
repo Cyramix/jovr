@@ -7,9 +7,10 @@ import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 public class TrackerPose extends Structure implements Structure.ByValue {
+  public int TrackerFlags;      ///< ovrTrackerFlags.
   public Posef Pose;
   public Posef LeveledPose;
-  
+  public byte[] padding = new byte[4];
 
   public TrackerPose() {
     super();
@@ -21,7 +22,7 @@ public class TrackerPose extends Structure implements Structure.ByValue {
 
   @Override
   protected List<?> getFieldOrder() {
-    return Arrays.asList("Pose", "LeveledPose");
+    return Arrays.asList("TrackerFlags", "Pose", "LeveledPose", "padding");
   }
 
 }

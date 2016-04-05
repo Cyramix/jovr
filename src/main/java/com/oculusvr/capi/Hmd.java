@@ -7,6 +7,7 @@ import java.nio.FloatBuffer;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
+import static com.oculusvr.capi.OvrLibrary.ovrSuccessType.ovrSuccess;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.ptr.IntByReference;
@@ -175,9 +176,13 @@ public class Hmd extends PointerType {
   // }
   //
 
-  public int recenterPose() {
-    return OvrLibrary.INSTANCE.ovr_RecenterTrackingOrigin(this);
+  public void recenterPose() throws OvrException {
+    int callResult = OvrLibrary.INSTANCE.ovr_RecenterTrackingOrigin(this);
     
+    if (callResult != ovrSuccess) {
+      throw OvrException.createException("Could not recenter pose");
+    }
+
   }
 
   public TrackingState getTrackingState(double absTime, boolean latencyMarker) {
@@ -208,7 +213,7 @@ public class Hmd extends PointerType {
 
   public Posef[] getEyePoses(int frameIndex, OvrVector3f hmdToEyeViewOffsets[]) {
     TrackingState trackingState = getTrackingState(getPredictedDisplayTime(frameIndex), false);
-    return CalcEyePoses(trackingState.HeadPose.Pose, hmdToEyeViewOffsets);
+    return CalcEyePoses(trackingState.HeadPose.ThePose, hmdToEyeViewOffsets);
   }
 
   public Pointer createSwapTextureChain(TextureSwapChainDesc desc) {
@@ -259,8 +264,8 @@ public class Hmd extends PointerType {
       return intByReference.getValue();
   }
   
-  public void destroyMirrorTexture(GLTexture texture) {
-    OvrLibrary.INSTANCE.ovr_DestroyMirrorTexture(this, texture.getPointer());
+  public void destroyMirrorTexture(Pointer mirrorTexture) {
+    OvrLibrary.INSTANCE.ovr_DestroyMirrorTexture(this, mirrorTexture);
   }
 
   public int submitFrame(int frameIndex, LayerEyeFov layer) {
@@ -268,5 +273,13 @@ public class Hmd extends PointerType {
     PointerByReference p = new PointerByReference();
     p.setValue(layer.getPointer());
     return OvrLibrary.INSTANCE.ovr_SubmitFrame(this, frameIndex, Pointer.NULL, p, 1);
+  }
+  
+  public static ErrorInfo getLastErrorInfo() {
+    ErrorInfo errorInfo = new ErrorInfo();
+    
+    OvrLibrary.INSTANCE.ovr_GetLastErrorInfo(errorInfo);
+    
+    return errorInfo;
   }
 }

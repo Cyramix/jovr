@@ -124,6 +124,9 @@ public interface OvrLibrary extends Library {
     public static final int ovrHmd_E3_2015 = 10;
     public static final int ovrHmd_ES06 = 11;
     public static final int ovrHmd_ES09 = 12;
+    public static final int ovrHmd_ES11 = 13;
+    public static final int ovrHmd_CV1 = 14;
+    
   };
 
   public static interface ovrHmdCaps {
@@ -296,7 +299,37 @@ public interface OvrLibrary extends Library {
   
   Pointer ovr_GetVersionString();
 
-  int ovr_RecenterTrackingOrigin(Hmd hmd);
+  /**
+   * Re-centers the sensor position and orientation.
+   *
+   * This resets the (x,y,z) positional components and the yaw orientation
+   * component. The Roll and pitch orientation components are always determined
+   * by gravity and cannot be redefined. All future tracking will report values
+   * relative to this new reference position. If you are using ovrTrackerPoses
+   * then you will need to call ovr_GetTrackerPose after this, because the
+   * sensor position(s) will change as a result of this.
+   *
+   * The headset cannot be facing vertically upward or downward but rather must
+   * be roughly level otherwise this function will fail with
+   * ovrError_InvalidHeadsetOrientation.
+   *
+   * For more info, see the notes on each ovrTrackingOrigin enumeration to
+   * understand how recenter will vary slightly in its behavior based on the
+   * current ovrTrackingOrigin setting.
+   *
+   * @param session Specifies an ovrSession previously returned by
+   * ovr_Create.
+   *
+   * @return Returns an ovrResult indicating success or failure. In the case of
+   * failure, use ovr_GetLastErrorInfo to get more information. Return values
+   * include but aren't limited to: - ovrSuccess: Completed successfully. -
+   * ovrError_InvalidHeadsetOrientation: The headset was facing an invalid
+   * direction when attempting recentering, such as facing vertically.
+   *
+   * @see ovrTrackingOrigin, ovr_GetTrackerPose
+   *
+   */
+  int ovr_RecenterTrackingOrigin(Hmd session);
 
   // String ovr_GetLastError(Hmd hmd);
 
@@ -352,5 +385,6 @@ public interface OvrLibrary extends Library {
 
   int ovr_SubmitFrame(Hmd session, int frameIndex, Pointer viewScaleDesc, PointerByReference layers, int layerCount);
   
+  void ovr_GetLastErrorInfo(ErrorInfo errorInfo);
   
 }

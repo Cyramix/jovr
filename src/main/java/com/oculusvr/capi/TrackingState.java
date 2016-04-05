@@ -8,18 +8,21 @@ import com.sun.jna.Structure;
 
 public class TrackingState extends Structure implements Structure.ByValue {
   public PoseStatef HeadPose;
-  public Posef CameraPose;
-  public Posef LeveledCameraPose;
-  public PoseStatef[] HandPoses = new PoseStatef[2];
-  public SensorData RawSensorData;
   public int StatusFlags;
-  
+  public PoseStatef[] HandPoses = new PoseStatef[2];
   /// Hand status flags described by ovrStatusBits.
   /// Only ovrStatus_OrientationTracked and ovrStatus_PositionTracked are reported.
   public int[] HandStatusFlags= new int[2];
-
-  public int LastCameraFrameCounter;
-  public byte[] padding = new byte[4];
+  
+  
+  /// The pose of the origin captured during calibration.
+  /// Like all other poses here, this is expressed in the space set by ovr_RecenterTrackingOrigin,
+  /// and so will change every time that is called. This pose can be used to calculate
+  /// where the calibrated origin lands in the new recentered space.
+  /// If an application never calls ovr_RecenterTrackingOrigin, expect this value to be the identity
+  /// pose and as such will point respective origin based on ovrTrackingOrigin requested when
+  /// calling ovr_GetTrackingState.
+  public Posef CalibratedOrigin;
 
   public TrackingState() {
     super();
@@ -31,8 +34,8 @@ public class TrackingState extends Structure implements Structure.ByValue {
 
   @Override
   protected List<?> getFieldOrder() {
-    return Arrays.asList("HeadPose", "CameraPose", "LeveledCameraPose", "HandPoses", "RawSensorData", "StatusFlags",
-        "HandStatusFlags", "LastCameraFrameCounter", "padding");
+    return Arrays.asList("HeadPose", "StatusFlags", "HandPoses",
+        "HandStatusFlags", "CalibratedOrigin");
   }
 
 }

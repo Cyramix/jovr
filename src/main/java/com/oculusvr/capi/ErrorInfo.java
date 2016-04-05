@@ -5,24 +5,35 @@ import java.util.List;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class EyeRenderDesc extends Structure implements Structure.ByValue {
-  public int Eye;
-  public FovPort Fov;
-  public OvrRecti DistortedViewport;
-  public OvrVector2f PixelsPerTanAngleAtCenter;
-  public OvrVector3f HmdToEyeViewOffset;
+public class ErrorInfo extends Structure implements Structure.ByValue {
+  public int Result;
+  public byte[] ErrorString = new byte[512];
 
-  public EyeRenderDesc() {
+  public ErrorInfo() {
     super();
   }
 
-  public EyeRenderDesc(Pointer peer) {
+  public ErrorInfo(Pointer peer) {
     super(peer);
   }
 
   @Override
   protected List<?> getFieldOrder() {
-    return Arrays.asList("Eye", "Fov", "DistortedViewport", "PixelsPerTanAngleAtCenter", "HmdToEyeViewOffset");
+    return Arrays.asList("Result", "ErrorString");
   }
+  
+  public String getErrorString() {
+    try {
+      return new String(ErrorString, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      Logger.getLogger(HmdDesc.class.getName()).log(Level.SEVERE, null, ex);
+      
+      return null;
+    }
+  }
+  
 }
