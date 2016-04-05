@@ -12,10 +12,6 @@ public class TrackerPose extends Structure implements Structure.ByValue {
   public Posef LeveledPose;
   public byte[] padding = new byte[4];
 
-  public TrackerPose() {
-    super();
-  }
-
   public TrackerPose(Pointer peer) {
     super(peer);
   }

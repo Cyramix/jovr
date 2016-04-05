@@ -14,7 +14,6 @@ public class TrackingState extends Structure implements Structure.ByValue {
   /// Only ovrStatus_OrientationTracked and ovrStatus_PositionTracked are reported.
   public int[] HandStatusFlags= new int[2];
   
-  
   /// The pose of the origin captured during calibration.
   /// Like all other poses here, this is expressed in the space set by ovr_RecenterTrackingOrigin,
   /// and so will change every time that is called. This pose can be used to calculate
