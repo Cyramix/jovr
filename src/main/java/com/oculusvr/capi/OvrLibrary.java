@@ -6,6 +6,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 import com.sun.jna.Pointer;
+import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
 public interface OvrLibrary extends Library {
@@ -45,11 +46,15 @@ public interface OvrLibrary extends Library {
   public static final String OVR_DEBUG_HUD_STEREO_GUIDE_YAWPITCHROLL = "DebugHudStereoGuideYawPitchRoll3f";
   public static final String OVR_DEBUG_HUD_STEREO_GUIDE_COLOR = "DebugHudStereoGuideColor4f";
 
-  public static final int PRODUCT_VERSION = 0;
-  public static final int MAJOR_VERSION = 8;
-  public static final String BIT_DEPTH = "64";
-  public static final String LIBRARY_NAME = String.format("LibOVRRT%s_%d_%d.dll", BIT_DEPTH, PRODUCT_VERSION,
-      MAJOR_VERSION);
+  public static final int OVR_PRODUCT_VERSION = 1;
+  public static final int OVR_MAJOR_VERSION = 1;
+  public static final int OVR_MINOR_VERSION = 3;
+  public static final int OVR_PATCH_VERSION = 0;
+  public static final int OVR_BUILD_NUMBER = 0;
+
+  public static final String BIT_DEPTH = System.getProperty("sun.arch.data.model");
+  public static final String LIBRARY_NAME = String.format("LibOVRRT%s_%d.dll", BIT_DEPTH, OVR_PRODUCT_VERSION,
+      OVR_MAJOR_VERSION);
   public static final NativeLibrary JNA_NATIVE_LIB = NativeLibrary.getInstance(LIBRARY_NAME);
   public static final OvrLibrary INSTANCE = (OvrLibrary) Native.loadLibrary(LIBRARY_NAME, OvrLibrary.class);
 
@@ -69,6 +74,7 @@ public interface OvrLibrary extends Library {
     public static final int ovrError_InvalidParameter = -1005;
     public static final int ovrError_ServiceError = -1006;
     public static final int ovrError_NoHmd = -1007;
+    public static final int ovrError_InvalidHeadsetOrientation  = -1011;   ///< The headset was in an invalid orientation for the requested operation (e.g. vertically oriented during ovr_RecenterPose).
 
     public static final int ovrError_AudioReservedBegin = -2000;
     public static final int ovrError_AudioReservedEnd = -2999;
@@ -118,6 +124,9 @@ public interface OvrLibrary extends Library {
     public static final int ovrHmd_E3_2015 = 10;
     public static final int ovrHmd_ES06 = 11;
     public static final int ovrHmd_ES09 = 12;
+    public static final int ovrHmd_ES11 = 13;
+    public static final int ovrHmd_CV1 = 14;
+    
   };
 
   public static interface ovrHmdCaps {
@@ -155,8 +164,6 @@ public interface OvrLibrary extends Library {
   public static interface ovrStatusBits {
     public static final int ovrStatus_OrientationTracked = 0x0001;
     public static final int ovrStatus_PositionTracked = 0x0002;
-    public static final int ovrStatus_CameraPoseTracked = 0x0004;
-    public static final int ovrStatus_PositionConnected = 0x0020;
     public static final int ovrStatus_HmdConnected = 0x0080;
   };
 
@@ -165,15 +172,13 @@ public interface OvrLibrary extends Library {
     public static final int ovrRenderAPI_OpenGL = 1;
     public static final int ovrRenderAPI_Android_GLES = 2;
     public static final int ovrRenderAPI_D3D11 = 5;
-  };
+  };    
 
   public static interface ovrLayerType {
     public static final int ovrLayerType_Disabled = 0;
     public static final int ovrLayerType_EyeFov = 1;
-    public static final int ovrLayerType_EyeFovDepth = 2;
     public static final int ovrLayerType_Quad = 3;
     public static final int ovrLayerType_EyeMatrix = 5;
-    public static final int ovrLayerType_Direct = 6;
   };
 
   public static interface ovrLayerFlags {
@@ -192,7 +197,7 @@ public interface OvrLibrary extends Library {
 
   public static interface ovrProjectionModifier {
     public static final int ovrProjection_None = 0x00;
-    public static final int ovrProjection_RightHanded = 0x01;
+    public static final int ovrProjection_LeftHanded = 0x01;
     public static final int ovrProjection_FarLessThanNear = 0x02;
     public static final int ovrProjection_FarClipAtInfinity = 0x04;
     public static final int ovrProjection_ClipRangeOpenGL = 0x08;
@@ -225,11 +230,58 @@ public interface OvrLibrary extends Library {
   };
   
 
+    /// The type of texture resource.
+    ///
+    /// @see ovrTextureSwapChainDesc
+    ///
+    public static interface ovrTextureType {
+
+      public static final int ovrTexture_2D = 0;              ///< 2D textures.
+      public static final int ovrTexture_2D_External = 1;     ///< External 2D texture. Not used on PC
+      public static final int ovrTexture_Cube = 2;            ///< Cube maps. Not currently supported on PC.
+      public static final int ovrTexture_Count = 3;
+    };
+
+    /// The format of a texture.
+    ///
+    /// \see ovrTextureSwapChainDesc
+    ///
+    public static interface ovrTextureFormat {
+        
+        public static final int OVR_FORMAT_UNKNOWN = 0;
+        public static final int OVR_FORMAT_B5G6R5_UNORM = 1;    ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+        public static final int OVR_FORMAT_B5G5R5A1_UNORM = 2;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+        public static final int OVR_FORMAT_B4G4R4A4_UNORM = 3;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+        public static final int OVR_FORMAT_R8G8B8A8_UNORM = 4;
+        public static final int OVR_FORMAT_R8G8B8A8_UNORM_SRGB = 5;
+        public static final int OVR_FORMAT_B8G8R8A8_UNORM = 6;
+        public static final int OVR_FORMAT_B8G8R8A8_UNORM_SRGB = 7; ///< Not supported for OpenGL applications
+        public static final int OVR_FORMAT_B8G8R8X8_UNORM = 8;      ///< Not supported for OpenGL applications
+        public static final int OVR_FORMAT_B8G8R8X8_UNORM_SRGB = 9; ///< Not supported for OpenGL applications
+        public static final int OVR_FORMAT_R16G16B16A16_FLOAT = 10;
+        public static final int OVR_FORMAT_D16_UNORM = 11;
+        public static final int OVR_FORMAT_D24_UNORM_S8_UINT = 12;
+        public static final int OVR_FORMAT_D32_FLOAT = 13;
+        public static final int OVR_FORMAT_D32_FLOAT_S8X24_UINT = 13;
+
+    };
+
+    ///  Specifies sensor flags.
+    ///
+    ///  /see ovrTrackerPose
+    ///
+    public static interface ovrTrackerFlags {
+        
+        public static final int ovrTracker_Connected   = 0x0020;      ///< The sensor is present, else the sensor is absent or offline.
+        public static final int ovrTracker_PoseTracked = 0x0004;       ///< The sensor has a valid pose, else the pose is unavailable. This will only be set if ovrTracker_Connected is set.
+
+    }
+  
 ///  Specifies the maximum number of layers supported by ovr_SubmitFrame.
 ///
 ///  /see ovr_SubmitFrame
 ///
-  public static final int ovrMaxLayerCount = 32;
+  public static final int ovrMaxLayerCount = 16;
   
   int ovr_Initialize(Pointer p);
 
@@ -245,15 +297,37 @@ public interface OvrLibrary extends Library {
   
   Pointer ovr_GetVersionString();
 
-  int ovr_GetEnabledCaps(Hmd hmd);
-
-  void ovr_SetEnabledCaps(Hmd hmd, int hmdCaps);
-
-  int ovr_GetTrackingCaps(Hmd session);
-  
-  int ovr_ConfigureTracking(Hmd hmd, int supportedTrackingCaps, int requiredTrackingCaps);
-
-  void ovr_RecenterPose(Hmd hmd);
+  /**
+   * Re-centers the sensor position and orientation.
+   *
+   * This resets the (x,y,z) positional components and the yaw orientation
+   * component. The Roll and pitch orientation components are always determined
+   * by gravity and cannot be redefined. All future tracking will report values
+   * relative to this new reference position. If you are using ovrTrackerPoses
+   * then you will need to call ovr_GetTrackerPose after this, because the
+   * sensor position(s) will change as a result of this.
+   *
+   * The headset cannot be facing vertically upward or downward but rather must
+   * be roughly level otherwise this function will fail with
+   * ovrError_InvalidHeadsetOrientation.
+   *
+   * For more info, see the notes on each ovrTrackingOrigin enumeration to
+   * understand how recenter will vary slightly in its behavior based on the
+   * current ovrTrackingOrigin setting.
+   *
+   * @param session Specifies an ovrSession previously returned by
+   * ovr_Create.
+   *
+   * @return Returns an ovrResult indicating success or failure. In the case of
+   * failure, use ovr_GetLastErrorInfo to get more information. Return values
+   * include but aren't limited to: - ovrSuccess: Completed successfully. -
+   * ovrError_InvalidHeadsetOrientation: The headset was facing an invalid
+   * direction when attempting recentering, such as facing vertically.
+   *
+   * @see ovrTrackingOrigin, ovr_GetTrackerPose
+   *
+   */
+  int ovr_RecenterTrackingOrigin(Hmd session);
 
   // String ovr_GetLastError(Hmd hmd);
 
@@ -289,13 +363,26 @@ public interface OvrLibrary extends Library {
 
   OvrMatrix4f ovrMatrix4f_Projection(FovPort fov, float znear, float zfar, byte rightHanded);
 
-  int ovr_CreateSwapTextureSetGL(Hmd hmd, int format, int width, int height, PointerByReference pointer);
+  int ovr_CreateTextureSwapChainGL(Hmd session, TextureSwapChainDesc desc, PointerByReference out_TextureSwapChain);
 
-  void ovr_DestroySwapTextureSet(Hmd hmd, Pointer textureSet);
+  int ovr_GetTextureSwapChainBufferGL(Hmd session, Pointer chain, int index, IntByReference out_TexId);
 
-  int ovr_CreateMirrorTextureGL(Hmd hmd, int format, int width, int height, PointerByReference pointer);
+  int ovr_GetTextureSwapChainLength(Hmd session, Pointer chain, IntByReference out_Length);
+  
+  int ovr_GetTextureSwapChainCurrentIndex(Hmd session, Pointer chain, IntByReference out_Index);
 
-  void ovr_DestroyMirrorTexture(Hmd hmd, Pointer mirrorTexture);
+  int ovr_CommitTextureSwapChain(Hmd session, Pointer chain);
+  
+  void ovr_DestroyTextureSwapChain(Hmd session, Pointer chain);
 
-  int ovr_SubmitFrame(Hmd hmd, int frameIndex, Pointer viewScaleDesc, PointerByReference layers, int layerCount);
+  int ovr_CreateMirrorTextureGL(Hmd session, MirrorTextureDesc desc, PointerByReference out_MirrorTexture);
+
+  int ovr_GetMirrorTextureBufferGL(Hmd session, Pointer mirrorTexture, IntByReference out_TexId);
+  
+  void ovr_DestroyMirrorTexture(Hmd session, Pointer mirrorTexture);
+
+  int ovr_SubmitFrame(Hmd session, int frameIndex, Pointer viewScaleDesc, PointerByReference layers, int layerCount);
+  
+  void ovr_GetLastErrorInfo(ErrorInfo errorInfo);
+  
 }

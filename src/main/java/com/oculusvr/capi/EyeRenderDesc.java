@@ -11,7 +11,7 @@ public class EyeRenderDesc extends Structure implements Structure.ByValue {
   public FovPort Fov;
   public OvrRecti DistortedViewport;
   public OvrVector2f PixelsPerTanAngleAtCenter;
-  public OvrVector3f HmdToEyeViewOffset;
+  public OvrVector3f HmdToEyeOffset;
 
   public EyeRenderDesc() {
     super();
@@ -23,6 +23,6 @@ public class EyeRenderDesc extends Structure implements Structure.ByValue {
 
   @Override
   protected List<?> getFieldOrder() {
-    return Arrays.asList("Eye", "Fov", "DistortedViewport", "PixelsPerTanAngleAtCenter", "HmdToEyeViewOffset");
+    return Arrays.asList("Eye", "Fov", "DistortedViewport", "PixelsPerTanAngleAtCenter", "HmdToEyeOffset");
   }
 }
