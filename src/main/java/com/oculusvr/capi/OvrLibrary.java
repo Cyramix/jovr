@@ -203,84 +203,120 @@ public interface OvrLibrary extends Library {
     public static final int ovrProjection_ClipRangeOpenGL = 0x08;
   };
 
-/// Describes button input types.
-/// Button inputs are combined; that is they will be reported as pressed if they are 
-/// pressed on either one of the two devices.
-/// The ovrButton_Up/Down/Left/Right map to both XBox D-Pad and directional buttons.
-/// The ovrButton_Enter and ovrButton_Return map to Start and Back controller buttons, respectively.
+  /// Describes button input types.
+  /// Button inputs are combined; that is they will be reported as pressed if they are 
+  /// pressed on either one of the two devices.
+  /// The ovrButton_Up/Down/Left/Right map to both XBox D-Pad and directional buttons.
+  /// The ovrButton_Enter and ovrButton_Return map to Start and Back controller buttons, respectively.
   public static interface ovrButton {
-    public static final int ovrButton_A         = 0x00000001;
-    public static final int ovrButton_B         = 0x00000002;
-    public static final int ovrButton_RThumb    = 0x00000004;
+
+    public static final int ovrButton_A = 0x00000001;
+    public static final int ovrButton_B = 0x00000002;
+    public static final int ovrButton_RThumb = 0x00000004;
     public static final int ovrButton_RShoulder = 0x00000008;
-    public static final int ovrButton_X         = 0x00000100;
-    public static final int ovrButton_Y         = 0x00000200;
-    public static final int ovrButton_LThumb    = 0x00000400;  
+
+    // Bit mask of all buttons on the right Touch controller
+    public static final int ovrButton_RMask = ovrButton_A | ovrButton_B | ovrButton_RThumb | ovrButton_RShoulder;
+
+    public static final int ovrButton_X = 0x00000100;
+    public static final int ovrButton_Y = 0x00000200;
+    public static final int ovrButton_LThumb = 0x00000400;
     public static final int ovrButton_LShoulder = 0x00000800;
 
+    // Bit mask of all buttons on the left Touch controller
+    public static final int ovrButton_LMask = ovrButton_X | ovrButton_Y | ovrButton_LThumb | ovrButton_LShoulder;
+
     // Navigation through DPad.
-    public static final int ovrButton_Up        = 0x00010000;
-    public static final int ovrButton_Down      = 0x00020000;
-    public static final int ovrButton_Left      = 0x00040000;
-    public static final int ovrButton_Right     = 0x00080000;
-    public static final int ovrButton_Enter     = 0x00100000; // Start on XBox controller.
-    public static final int ovrButton_Back      = 0x00200000; // Back on Xbox controller.     
+    public static final int ovrButton_Up = 0x00010000;
+    public static final int ovrButton_Down = 0x00020000;
+    public static final int ovrButton_Left = 0x00040000;
+    public static final int ovrButton_Right = 0x00080000;
+    public static final int ovrButton_Enter = 0x00100000; // Start on XBox controller.
+    public static final int ovrButton_Back = 0x00200000; // Back on Xbox controller.     
+    public static final int ovrButton_VolUp = 0x00400000;  // only supported by Remote.
+    public static final int ovrButton_VolDown = 0x00800000;  // only supported by Remote.
+    public static final int ovrButton_Home = 0x01000000;
+    public static final int ovrButton_Private = ovrButton_VolUp | ovrButton_VolDown | ovrButton_Home;
 
-    public static final int ovrButton_Private   = 0x00400000 | 0x00800000 | 0x01000000;
   };
+
+/// Provides names for the left and right hand array indexes.
+///
+/// \see ovrInputState, ovrTrackingState
+/// 
+  public static interface ovrHandType {
+
+    public static final int ovrHand_Left = 0;
+    public static final int ovrHand_Right = 1;
+    public static final int ovrHand_Count = 2;
+  };
+
   
 
-    /// The type of texture resource.
-    ///
-    /// @see ovrTextureSwapChainDesc
-    ///
-    public static interface ovrTextureType {
+  /// The type of texture resource.
+  ///
+  /// @see ovrTextureSwapChainDesc
+  ///
+  public static interface ovrTextureType {
 
-      public static final int ovrTexture_2D = 0;              ///< 2D textures.
-      public static final int ovrTexture_2D_External = 1;     ///< External 2D texture. Not used on PC
-      public static final int ovrTexture_Cube = 2;            ///< Cube maps. Not currently supported on PC.
-      public static final int ovrTexture_Count = 3;
-    };
+    public static final int ovrTexture_2D = 0;              ///< 2D textures.
+    public static final int ovrTexture_2D_External = 1;     ///< External 2D texture. Not used on PC
+    public static final int ovrTexture_Cube = 2;            ///< Cube maps. Not currently supported on PC.
+    public static final int ovrTexture_Count = 3;
+  };
 
-    /// The format of a texture.
-    ///
-    /// \see ovrTextureSwapChainDesc
-    ///
-    public static interface ovrTextureFormat {
-        
-        public static final int OVR_FORMAT_UNKNOWN = 0;
-        public static final int OVR_FORMAT_B5G6R5_UNORM = 1;    ///< Not currently supported on PC. Would require a DirectX 11.1 device.
-        public static final int OVR_FORMAT_B5G5R5A1_UNORM = 2;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
-        public static final int OVR_FORMAT_B4G4R4A4_UNORM = 3;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
-        public static final int OVR_FORMAT_R8G8B8A8_UNORM = 4;
-        public static final int OVR_FORMAT_R8G8B8A8_UNORM_SRGB = 5;
-        public static final int OVR_FORMAT_B8G8R8A8_UNORM = 6;
-        public static final int OVR_FORMAT_B8G8R8A8_UNORM_SRGB = 7; ///< Not supported for OpenGL applications
-        public static final int OVR_FORMAT_B8G8R8X8_UNORM = 8;      ///< Not supported for OpenGL applications
-        public static final int OVR_FORMAT_B8G8R8X8_UNORM_SRGB = 9; ///< Not supported for OpenGL applications
-        public static final int OVR_FORMAT_R16G16B16A16_FLOAT = 10;
-        public static final int OVR_FORMAT_D16_UNORM = 11;
-        public static final int OVR_FORMAT_D24_UNORM_S8_UINT = 12;
-        public static final int OVR_FORMAT_D32_FLOAT = 13;
-        public static final int OVR_FORMAT_D32_FLOAT_S8X24_UINT = 13;
+  /// The format of a texture.
+  ///
+  /// \see ovrTextureSwapChainDesc
+  ///
+  public static interface ovrTextureFormat {
 
-    };
+    public static final int OVR_FORMAT_UNKNOWN = 0;
+    public static final int OVR_FORMAT_B5G6R5_UNORM = 1;    ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+    public static final int OVR_FORMAT_B5G5R5A1_UNORM = 2;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+    public static final int OVR_FORMAT_B4G4R4A4_UNORM = 3;  ///< Not currently supported on PC. Would require a DirectX 11.1 device.
+    public static final int OVR_FORMAT_R8G8B8A8_UNORM = 4;
+    public static final int OVR_FORMAT_R8G8B8A8_UNORM_SRGB = 5;
+    public static final int OVR_FORMAT_B8G8R8A8_UNORM = 6;
+    public static final int OVR_FORMAT_B8G8R8A8_UNORM_SRGB = 7; ///< Not supported for OpenGL applications
+    public static final int OVR_FORMAT_B8G8R8X8_UNORM = 8;      ///< Not supported for OpenGL applications
+    public static final int OVR_FORMAT_B8G8R8X8_UNORM_SRGB = 9; ///< Not supported for OpenGL applications
+    public static final int OVR_FORMAT_R16G16B16A16_FLOAT = 10;
+    public static final int OVR_FORMAT_D16_UNORM = 11;
+    public static final int OVR_FORMAT_D24_UNORM_S8_UINT = 12;
+    public static final int OVR_FORMAT_D32_FLOAT = 13;
+    public static final int OVR_FORMAT_D32_FLOAT_S8X24_UINT = 13;
 
-    ///  Specifies sensor flags.
-    ///
-    ///  /see ovrTrackerPose
-    ///
-    public static interface ovrTrackerFlags {
-        
-        public static final int ovrTracker_Connected   = 0x0020;      ///< The sensor is present, else the sensor is absent or offline.
-        public static final int ovrTracker_PoseTracked = 0x0004;       ///< The sensor has a valid pose, else the pose is unavailable. This will only be set if ovrTracker_Connected is set.
+  };
 
-    }
+  /// Specifies which controller is connected; multiple can be connected at once.
+  public static interface ovrControllerType {
+    public static final int ovrControllerType_None      = 0x00;
+    public static final int ovrControllerType_LTouch    = 0x01;
+    public static final int ovrControllerType_RTouch    = 0x02;
+    public static final int ovrControllerType_Touch     = 0x03;
+    public static final int ovrControllerType_Remote    = 0x04;
+    public static final int ovrControllerType_XBox      = 0x10;
+
+    public static final int ovrControllerType_Active    = 0xff;      ///< Operate on or query whichever controller is active.
+
+};
+
+  ///  Specifies sensor flags.
+  ///
+  ///  /see ovrTrackerPose
+  ///
+  public static interface ovrTrackerFlags {
+
+    public static final int ovrTracker_Connected = 0x0020;      ///< The sensor is present, else the sensor is absent or offline.
+    public static final int ovrTracker_PoseTracked = 0x0004;       ///< The sensor has a valid pose, else the pose is unavailable. This will only be set if ovrTracker_Connected is set.
+
+  }
   
-///  Specifies the maximum number of layers supported by ovr_SubmitFrame.
-///
-///  /see ovr_SubmitFrame
-///
+  ///  Specifies the maximum number of layers supported by ovr_SubmitFrame.
+  ///
+  ///  /see ovr_SubmitFrame
+  ///
   public static final int ovrMaxLayerCount = 16;
   
   int ovr_Initialize(Pointer p);
@@ -333,6 +369,21 @@ public interface OvrLibrary extends Library {
 
   TrackingState ovr_GetTrackingState(Hmd hmd, double absTime, byte latencyMarker);
 
+  /**
+   * Returns the most recent input state for controllers, without positional
+   * tracking info.
+   *
+   * @param[out] inputState Input state that will be filled in.
+   * @param[in] ovrControllerType Specifies which controller the input will be
+   * returned for.
+   *
+   * @return Returns ovrSuccess if the new state was successfully obtained.
+   *
+   * @see ovrControllerType
+   *
+   */
+  int ovr_GetInputState(Hmd session, int controllerType, InputState inputState);
+  
   OvrSizei ovr_GetFovTextureSize(Hmd hmd, int eye, FovPort fov, float pixelsPerDisplayPixel);
 
   EyeRenderDesc ovr_GetRenderDesc(Hmd hmd, int eyeType, FovPort fov);
