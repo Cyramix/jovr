@@ -6,6 +6,7 @@
 package com.oculusvr.capi;
 
 import com.oculusvr.capi.OvrLibrary.ovrHandType;
+import static com.oculusvr.capi.OvrLibrary.ovrSuccessType.ovrSuccess;
 import com.sun.jna.Structure;
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +41,32 @@ public class InputState extends Structure implements Structure.ByReference {
 
   // The type of the controller this state is for.
   public int ControllerType;
+  
+  private final Hmd session;
 
+  public InputState( Hmd session) {
+    this.session = session;
+  }
+  
+  
+  /**
+   * Returns the most recent input state for controllers, without positional
+   * tracking info.
+   * 
+   * @param controllerType Specifies which controller the input will be
+   * returned for.
+   *
+   * @see ovrControllerType
+   *
+   */  
+  public void getInputState(int controllerType) throws OvrException {
+    
+    int callResult = OvrLibrary.INSTANCE.ovr_GetInputState(this.session, controllerType, this);
+    if( callResult != ovrSuccess) {
+      throw new OvrException("getInputStateFailed");
+    }
+  }  
+  
   @Override
   protected List getFieldOrder() {
     return Arrays.asList("TimeInSeconds", "Buttons", "Touches", "IndexTrigger", "HandTrigger", "Thumbstick", "ControllerType");

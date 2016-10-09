@@ -31,8 +31,13 @@ public class Hmd extends PointerType {
   }
 
   public static void initialize() {
-    if (0 > OvrLibrary.INSTANCE.ovr_Initialize(Pointer.NULL)) {
-      throw new IllegalStateException("Unable to initialize Oculus SDK");
+    InitParams initParams = new InitParams();
+    initParams.Flags = OvrLibrary.ovrInitFlags.ovrInit_RequestVersion;
+    initParams.RequestedMinorVersion = 3;
+    
+    final int result = OvrLibrary.INSTANCE.ovr_Initialize(initParams);
+    if (0 > result) {
+      throw new IllegalStateException("Unable to initialize Oculus SDK: "  + result);
     }
   }
 
@@ -234,18 +239,6 @@ public class Hmd extends PointerType {
     return new MirrorTexture(this, texturePointer.getValue());
   }
 
-  public InputState getInputState(int controllerType) throws OvrException {
-    
-    InputState inputState = new InputState();
-    
-    int callResult = OvrLibrary.INSTANCE.ovr_GetInputState(this, controllerType, inputState);
-    if( callResult != ovrSuccess) {
-      throw new OvrException("getInputStateFailed");
-    }
-    
-    return inputState;
-  }
-  
   public int submitFrame(int frameIndex, LayerEyeFov layer) {
     layer.write();
     PointerByReference p = new PointerByReference();

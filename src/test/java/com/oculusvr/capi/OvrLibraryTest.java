@@ -5,7 +5,10 @@ import org.junit.Test;
 public class OvrLibraryTest {
 
   @Test
-  public void testInitHmd() throws InterruptedException {
+  public void testInitHmd() throws InterruptedException, OvrException {
+    
+    System.out.println("com.oculusvr.capi.OvrLibraryTest.testInitHmd(): "  + OvrLibrary.LIBRARY_NAME);
+    
     Hmd.initialize();
     Hmd hmd = Hmd.create();
     HmdDesc hmdDesc = hmd.getDesc();
